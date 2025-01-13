@@ -187,3 +187,16 @@ seleksyone 10 premye eleman : Entity.objects.all()[:10] sinou vle odone apati de
 
 seleksyone soti nan 10 rive nan 20 : Entity.objects.all().order_by(field_name)[10:20]
 django pa sipote endeksasyon negative : Entity.objects.all().order_by(field_name)[-10]
+
+# Django LIKE
+field_name__startswith : verifye si yon chan komanse pa tel ou tel karakte 
+Employee.objects.filter(first_name__startswith='Je') 
+Employee.objects.filter(first_name__istartswith='je') : san teni kont de majiskil ak miniskil
+
+field_name__endswith  : verifye si yon chan fini pa tel ou tel karakte
+Employee.objects.filter(first_name__endswith='er') 
+Employee.objects.filter(first_name__iendswith='ER') san teni kont de majiskil miniskil 
+
+field_name__contains : verifye si yon genyen tel ou tel karakte 
+ Employee.objects.filter(first_name__contains='ff')  
+ Employee.objects.filter(first_name__icontains='ff') : san teni kont de majiskil ak miniskil
