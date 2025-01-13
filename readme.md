@@ -182,3 +182,8 @@ retire tout anplwaye pou j1
 >>> j1.employees.clear() 
 
 
+# Django Limit Offset
+seleksyone 10 premye eleman : Entity.objects.all()[:10] sinou vle odone apati de yon chan Entity.objects.all().order_by(field_name)[:10]
+
+seleksyone soti nan 10 rive nan 20 : Entity.objects.all().order_by(field_name)[10:20]
+django pa sipote endeksasyon negative : Entity.objects.all().order_by(field_name)[-10]
