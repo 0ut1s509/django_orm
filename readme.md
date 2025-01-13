@@ -65,3 +65,44 @@ nou k aksede Employee apati de Contact(c.employee) vice versa(e.contact)
 seleksyone tout anplwaye ki nan yon depatman 
  d.employee_set.all()
  Employee.objects.select_related('department').all() : si nou ta vle aksede epi afiche anplwaye a ak tout depatman li nan yon paj
+
+ # Many-to-Many Relationship
+ >>> c1 = Compensation(name='Stock')
+>>> c1.save()
+>>> c2 = Compensation(name='Bonuses') 
+>>> c2.save()
+>>> c3 = Compensation(name='Profit Sharing')  
+>>> c3.save()
+>>> Compensation.objects.all()
+<QuerySet [<Compensation: Stock>, <Compensation: Bonuses>, <Compensation: Profit Sharing>]>
+bay anplwaye konpansasyon
+>>> e.compensations.add(c1)
+>>> e.compensations.add(c2) 
+>>> e.save()
+aksede tout konpansasyon yon anplwaye
+>>> e.compensations.all()
+<QuerySet [<Compensation: Stock>, <Compensation: Bonuses>]>
+
+>>> e = Employee.objects.filter(first_name='Jane',last_name='Doe').first()
+>>> e 
+<Employee: Jane Doe>
+>>> e.compensations.add(c1)
+>>> e.compensations.add(c2) 
+>>> e.compensations.add(c3) 
+>>> e.save()
+>>> e.compensations.all()
+<QuerySet [<Compensation: Stock>, <Compensation: Bonuses>, <Compensation: Profit Sharing>]>
+seleksyone tout anplwaye ki gen konpansasyon c1
+>>> c1
+<Compensation: Stock>
+>>> c1.employee_set.all()
+<QuerySet [<Employee: John Doe>, <Employee: Jane Doe>]>
+
+retire konpansasyon anplwaye
+>>> e = Employee.objects.filter(first_name='Jane',last_name='Doe').first()
+>>> e                                                                     
+<Employee: Jane Doe>
+>>> e.compensations.remove(c3)
+>>> e.save()
+
+efase tout anplwaye c3 : c3.employee_set.clear()
