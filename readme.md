@@ -40,3 +40,13 @@ Employee.objects.all() : seleksyone tout antre tab la
 e = Employee.objects.get(id=1) rekipere antre ki gen id 1 an
 Employee.objects.filter(first_name='Jane') rekipere antre ki gen firstname = jane
  e.delete() : efase antre ki t seleksyone a
+
+
+ # OneToOneField(to, on_delete, parent_link=False, **options)
+ >>> c = Contact(phone='40812345678', address='101 N 1st Street, San Jose, CA')
+>>> c.save()
+>>> e.contact = c
+>>> e.save()
+nou k aksede Employee apati de Contact(c.employee) vice versa(e.contact)
+
+>>> Employee.objects.select_related('contact').all() : si nou ta vle aksede epi afiche anplwaye a ak tout kontak li nan yon paj
