@@ -67,6 +67,35 @@ seleksyone tout anplwaye ki nan yon depatman
  Employee.objects.select_related('department').all() : si nou ta vle aksede epi afiche anplwaye a ak tout depatman li nan yon paj
 
  # Many-to-Many Relationship
+
+class Compensation(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class Employee(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+
+    contact = models.OneToOneField(
+        Contact,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
+    department = models.ForeignKey(
+        Department,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+    compensations = models.ManyToManyField(Compensation)
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'
+
  >>> c1 = Compensation(name='Stock')
 >>> c1.save()
 >>> c2 = Compensation(name='Bonuses') 
@@ -106,3 +135,50 @@ retire konpansasyon anplwaye
 >>> e.save()
 
 efase tout anplwaye c3 : c3.employee_set.clear()
+
+# ManyToManyField Through
+class Job(models.Model):
+    title = models.CharField(max_length=255)
+    employees = models.ManyToManyField(Employee, through='Assignment')
+
+    def __str__(self):
+        return self.title
+
+
+class Assignment(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    position = models.ForeignKey(Job, on_delete=models.CASCADE)
+    begin_date = models.DateField()
+    end_date = models.DateField(default=date(9999, 12, 31))
+
+
+>>> j1 = Job(title='Software Engineer I')
+>>> j1.save()
+>>> j2 = Job(title='Software Engineer II') 
+>>> j2.save() 
+>>> j3 = Job(title='Software Engineer III')
+>>> j3.save()
+>>> Job.objects.all()
+<QuerySet [<Job: Software Engineer I>, <Job: Software Engineer II>, <Job: Software Engineer III>]>
+
+>>> e1 = Employee.objects.filter(first_name='John',last_name='Doe').first()
+>>> e1
+<Employee: John Doe>
+>>> e2 = Employee.objects.filter(first_name='Jane', last_name='Doe').first()
+>>> e2
+<Employee: Jane Doe>
+
+>>> from datetime import date
+>>> a1 = Assignment(employee=e1,position=j1, begin_date=date(2019,1,1), end_date=date(2021,12,31))
+>>> a1.save()
+>>> a2 = Assignment(employee=e1,position=j2, begin_date=date(2022,1,1))
+>>> a2.save()
+>>> a3 = Assignment(employee=e2, position=j1, begin_date=date(2019, 3, 1))
+>>> a3.save()
+
+retire enstans nan model entemedye a
+>>> j2.employees.remove(e2) 
+retire tout anplwaye pou j1
+>>> j1.employees.clear() 
+
+
