@@ -50,3 +50,18 @@ Employee.objects.filter(first_name='Jane') rekipere antre ki gen firstname = jan
 nou k aksede Employee apati de Contact(c.employee) vice versa(e.contact)
 
 >>> Employee.objects.select_related('contact').all() : si nou ta vle aksede epi afiche anplwaye a ak tout kontak li nan yon paj
+
+# One-To-Many Relationship
+>>> d = Department(name='IT',description='Information Technology')
+>>> d.save()
+>>> e = Employee(first_name='John',last_name='Doe',department=d)
+>>> e.save()
+>>> e = Employee(first_name='Jane',last_name='Doe',department=d)
+>>> e.save()
+>>> e.department 
+<Department: IT>
+>>> e.department.description
+'Information Technology'
+seleksyone tout anplwaye ki nan yon depatman 
+ d.employee_set.all()
+ Employee.objects.select_related('department').all() : si nou ta vle aksede epi afiche anplwaye a ak tout depatman li nan yon paj
