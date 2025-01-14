@@ -272,3 +272,95 @@ SELECT SUM("hr_employee"."salary") AS "salary__sum"
   FROM "hr_employee"
 Execution time: 0.000140s [Database: default]
 {'salary__sum': Decimal('30162108.00')}
+
+# Django Group By
+## group by with count
+>>> (Employee.objects
+     .values('department')
+     .annotate(head_count=Count('department'))
+     .order_by('department')
+  )
+SELECT "hr_employee"."department_id",
+       COUNT("hr_employee"."department_id") AS "head_count"
+  FROM "hr_employee"
+ GROUP BY "hr_employee"."department_id"
+ ORDER BY "hr_employee"."department_id" ASC
+ LIMIT 21
+Execution time: 0.001492s [Database: default]
+<QuerySet [{'department': 1, 'head_count': 30}, {'department': 2, 'head_count': 40}, {'department': 3, 'head_count': 28}, {'department': 4, 'head_count': 29}, {'department': 5, 'head_count': 29}, {'department': 6, 'head_count': 30}, {'department': 7, 'head_count': 34}]>
+
+## Django Group By with Sum example
+>>> (Employee.objects
+...     .values('department')
+...     .annotate(total_salary=Sum('salary'))
+...     .order_by('department')
+...  )
+SELECT "hr_employee"."department_id",
+       SUM("hr_employee"."salary") AS "total_salary"
+  FROM "hr_employee"
+ GROUP BY "hr_employee"."department_id"
+ ORDER BY "hr_employee"."department_id" ASC
+ LIMIT 21
+Execution time: 0.000927s [Database: default]
+<QuerySet [{'department': 1, 'total_salary': Decimal('3615341.00')}, {'department': 2, 'total_salary': Decimal('5141611.00')}, {'department': 3, 'total_salary': Decimal('3728988.00')}, {'department': 4, 'total_salary': Decimal('3955669.00')}, {'department': 5, 'total_salary': Decimal('4385784.00')}, {'department': 6, 'total_salary': Decimal('4735927.00')}, {'department': 7, 'total_salary': Decimal('4598788.00')}]>
+
+
+##  Django Group By with Min, Max, and Avg example
+>>> (Employee.objects
+...     .values('department')
+...     .annotate(
+...         min_salary=Min('salary'),
+...         max_salary=Max('salary'),
+...         avg_salary=Avg('salary')
+...     )
+...     .order_by('department')
+...  )
+SELECT "hr_employee"."department_id",
+       MIN("hr_employee"."salary") AS "min_salary",
+       MAX("hr_employee"."salary") AS "max_salary",
+       AVG("hr_employee"."salary") AS "avg_salary"
+  FROM "hr_employee"
+ GROUP BY "hr_employee"."department_id"
+ ORDER BY "hr_employee"."department_id" ASC
+ LIMIT 21
+Execution time: 0.001670s [Database: default]
+<QuerySet [{'department': 1, 'min_salary': Decimal('45427.00'), 'max_salary': Decimal('149830.00'), 'avg_salary': Decimal('120511.366666666667')}, {'department': 
+2, 'min_salary': Decimal('46637.00'), 'max_salary': Decimal('243462.00'), 'avg_salary': Decimal('128540.275000000000')}, {'department': 3, 'min_salary': Decimal('40762.00'), 'max_salary': Decimal('248265.00'), 'avg_salary': Decimal('133178.142857142857')}, {'department': 4, 'min_salary': Decimal('43000.00'), 'max_salary': 
+Decimal('238016.00'), 'avg_salary': Decimal('136402.379310344828')}, {'department': 5, 'min_salary': Decimal('42080.00'), 'max_salary': Decimal('246403.00'), 'avg_salary': Decimal('151233.931034482759')}, {'department': 6, 'min_salary': Decimal('58356.00'), 'max_salary': Decimal('248312.00'), 'avg_salary': Decimal('157864.233333333333')}, {'department': 7, 'min_salary': Decimal('40543.00'), 'max_salary': Decimal('238892.00'), 'avg_salary': Decimal('135258.470588235294')}]>
+
+## Django group by with join example
+>>> (Department.objects
+...     .values('name')
+...     .annotate(
+...         head_count=Count('employee')
+...     )
+...  )
+SELECT "hr_department"."name",
+       COUNT("hr_employee"."id") AS "head_count"
+  FROM "hr_department"
+  LEFT OUTER JOIN "hr_employee"
+    ON ("hr_department"."id" = "hr_employee"."department_id")
+ GROUP BY "hr_department"."name"
+ LIMIT 21
+Execution time: 0.001953s [Database: default]
+<QuerySet [{'name': 'Marketing', 'head_count': 28}, {'name': 'Finance', 'head_count': 29}, {'name': 'SCM', 'head_count': 29}, {'name': 'GA', 'head_count': 30}, {'name': 'Sales', 'head_count': 40}, {'name': 'IT', 'head_count': 30}, {'name': 'HR', 'head_count': 34}]>
+
+
+## Django group by with having
+>>> (Department.objects
+...     .values('name')
+...     .annotate(
+...         head_count=Count('employee')
+...     )
+...     .filter(head_count__gt=30)
+...  )
+SELECT "hr_department"."name",
+       COUNT("hr_employee"."id") AS "head_count"
+  FROM "hr_department"
+  LEFT OUTER JOIN "hr_employee"
+    ON ("hr_department"."id" = "hr_employee"."department_id")
+ GROUP BY "hr_department"."name"
+HAVING COUNT("hr_employee"."id") > 30
+ LIMIT 21
+Execution time: 0.002893s [Database: default]
+<QuerySet [{'name': 'Sales', 'head_count': 40}, {'name': 'HR', 'head_count': 34}]>
