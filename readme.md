@@ -200,3 +200,75 @@ Employee.objects.filter(first_name__iendswith='ER') san teni kont de majiskil mi
 field_name__contains : verifye si yon genyen tel ou tel karakte 
  Employee.objects.filter(first_name__contains='ff')  
  Employee.objects.filter(first_name__icontains='ff') : san teni kont de majiskil ak miniskil
+
+ # Django In
+ field_name IN (v1, v2, ...) verifye si chan fe pati de yon lis kelkonk
+ Employee.objects.filter(department_id__in=(1,2,3)) : seleksyone anplwaye ke id depatman egal 1,2 oubyen 3
+ departments = Department.objects.filter(Q(name='Sales') | Q(name='Marketing')) : seleksyone ki egal a Sales oubyen Marketing
+ Employee.objects.filter(department__in=departments) : selesyone anplwaye ki fe pati de reket presedan
+
+ field_name NOT IN (v1, v2, ...) : verifye si chan pa fe pati de yon lis kelkonk
+ Employee.objects.filter(~Q(department_id__in=(1,2,3))) seleksyone anplwaye ke id depatman pa egal 1,2 oubyen 3
+ Employee.objects.exclude(department_id__in=(1,2,3)) 
+
+ # Django range
+ field_name BETWEEN low_value AND high_value
+ field_name >= low_value AND field_name <= high_value
+ Entity.objects.filter(field_name__range=(low_value,high_value))
+ >>> Employee.objects.filter(id__range=(1,5))
+  Assignment.objects.filter(begin_date__range=(start_date,end_date))  
+
+  NOT BETWEEN
+  Entity.objects.filter(~Q(field_name__range=(low_value,high_value)))
+  Employee.objects.filter(~Q(id__range=(1,5)))
+
+  # Django exists
+  >>> Employee.objects.filter(first_name__startswith='J').exists()
+SELECT 1 AS "a"
+  FROM "hr_employee"
+ WHERE "hr_employee"."first_name"::text LIKE 'J%'
+ LIMIT 1
+Execution time: 0.000000s [Database: default]
+True
+
+# Django Aggregate
+ Employee.objects.count() : count() kontrole konbyen kantite anplwaye ki genyen
+ >>> Employee.objects.count()
+SELECT COUNT(*) AS "__count"
+  FROM "hr_employee"        
+Execution time: 0.002160s [Database: default]
+220
+
+>>> Employee.objects.filter(first_name__startswith='J').count()
+SELECT COUNT(*) AS "__count"
+  FROM "hr_employee"
+ WHERE "hr_employee"."first_name"::text LIKE 'J%'
+Execution time: 0.000000s [Database: default]
+29
+# MAX
+>>> Employee.objects.aggregate(Max('salary'))
+SELECT MAX("hr_employee"."salary") AS "salary__max"
+  FROM "hr_employee"
+Execution time: 0.002001s [Database: default]
+{'salary__max': Decimal('248312.00')}
+
+# Min
+>>> Employee.objects.aggregate(Min('salary')) 
+SELECT MIN("hr_employee"."salary") AS "salary__min"
+  FROM "hr_employee"
+Execution time: 0.002015s [Database: default]
+{'salary__min': Decimal('40543.00')}   
+
+# Avg
+>>> Employee.objects.aggregate(Avg('salary')) 
+SELECT AVG("hr_employee"."salary") AS "salary__avg"
+  FROM "hr_employee"
+Execution time: 0.005468s [Database: default]
+{'salary__avg': Decimal('137100.490909090909')}
+
+# sum
+>>> Employee.objects.aggregate(Sum('salary')) 
+SELECT SUM("hr_employee"."salary") AS "salary__sum"
+  FROM "hr_employee"
+Execution time: 0.000140s [Database: default]
+{'salary__sum': Decimal('30162108.00')}

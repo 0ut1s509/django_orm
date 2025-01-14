@@ -26,6 +26,7 @@ class Compensation(models.Model):
 class Employee(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+    salary = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
 
     contact = models.OneToOneField(
         Contact,
