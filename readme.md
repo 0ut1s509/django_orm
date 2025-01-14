@@ -364,3 +364,25 @@ HAVING COUNT("hr_employee"."id") > 30
  LIMIT 21
 Execution time: 0.002893s [Database: default]
 <QuerySet [{'name': 'Sales', 'head_count': 40}, {'name': 'HR', 'head_count': 34}]>
+
+# Django isnull
+verifye si yon chan manke 
+
+Entity.objects.filter(field_name__isnull=True)
+>>> Employee.objects.filter(contact_id__isnull=True)
+SELECT "hr_employee"."id",
+       "hr_employee"."first_name",
+       "hr_employee"."last_name",
+       "hr_employee"."contact_id",
+       "hr_employee"."department_id"
+  FROM "hr_employee"
+ WHERE "hr_employee"."contact_id" IS NULL
+
+ >>> Employee.objects.filter(contact_id__isnull=False) 
+SELECT "hr_employee"."id",
+       "hr_employee"."first_name",
+       "hr_employee"."last_name",
+       "hr_employee"."contact_id",
+       "hr_employee"."department_id"
+  FROM "hr_employee"
+ WHERE "hr_employee"."contact_id" IS NOT NULL
